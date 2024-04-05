@@ -6,7 +6,7 @@ from .results import SearchResult, show_route_info
 
 
 @show_route_info
-def dijkstra(graph: Graph, start: Stop, end: Stop, departure_min: int) -> SearchResult:
+def astar(graph: Graph, start: Stop, end: Stop, departure_min: int) -> SearchResult:
     costs: dict[Stop, float] = {start: 0}
     came_from: dict[Stop, Optional[Route]] = {start: None}
 

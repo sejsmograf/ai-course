@@ -1,7 +1,12 @@
+import logging
 from pathlib import Path
 from .graph_structure import Graph, Route, Stop
 from .serialize import serialize, deserialize
 from .read_csv import get_data
+from .utils import minutes_from_str
+
+logging.basicConfig(level=logging.INFO)
+
 
 SERIALIZED_GRAPH_PATH = (
     Path(__file__).resolve().parent.parent / "data/serialized_graph.pickle"
@@ -16,11 +21,6 @@ START_LAT = "start_stop_lat"
 START_LON = "start_stop_lon"
 END_LAT = "end_stop_lat"
 END_LON = "end_stop_lon"
-
-
-def minutes_from_str(time_str: str) -> int:
-    hours, minutes, _ = time_str.split(":")
-    return int(hours) * 60 + int(minutes)
 
 
 def route_from_dict(row: dict[str, str]) -> Route:
@@ -61,11 +61,15 @@ def create_graph(data: list[dict[str, str]]) -> Graph:
 
 def get_graph(serialized_path: Path = SERIALIZED_GRAPH_PATH):
     if serialized_path.exists():
+        logging.info(f"Found serialized graph: {serialized_path}")
+        logging.info(f"Loading serialized graph")
         graph = deserialize(serialized_path)
         return graph
 
     data: list[dict[str, str]] = get_data()
+    logging.info("Creating graph")
     graph = create_graph(data)
 
+    logging.info(f"Serializing graph: {serialized_path}")
     serialize(graph, serialized_path)
     return graph
