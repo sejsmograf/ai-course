@@ -1,5 +1,5 @@
 from typing import Optional
-from ..process_data import Route
+from process_data import Route
 
 
 def minutes_cost(

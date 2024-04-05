@@ -6,7 +6,7 @@ from .serialize import deserialize, serialize
 PARENT_DIR_PATH: Path = Path(__file__).resolve().parent.parent
 
 CSV_PATH: Path = PARENT_DIR_PATH / "data/connection_graph.csv"
-SERIALIZED_CSV_PATH: Path = PARENT_DIR_PATH / "data/serilized_connection_graph.pickle"
+SERIALIZED_CSV_PATH: Path = PARENT_DIR_PATH / "data/serialized_connection_graph.pickle"
 
 
 def read_csv_to_dict(path: Path) -> list[dict[str, str]]:

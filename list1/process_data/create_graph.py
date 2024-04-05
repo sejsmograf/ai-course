@@ -61,7 +61,6 @@ def create_graph(data: list[dict[str, str]]) -> Graph:
 
 def get_graph(serialized_path: Path = SERIALIZED_GRAPH_PATH):
     if serialized_path.exists():
-        print("serialized")
         graph = deserialize(serialized_path)
         return graph
 
