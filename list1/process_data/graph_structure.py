@@ -9,8 +9,8 @@ class Route(NamedTuple):
     line: str
     start_stop: Stop
     end_stop: Stop
-    departure_minutes: int
-    arrival_minutes: int
+    departure_min: int
+    arrival_min: int
     start_stop_lat: float
     start_stop_lon: float
     end_stop_lat: float
