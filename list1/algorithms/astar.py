@@ -12,6 +12,7 @@ def astar_time(
     end: Stop,
     departure_min: int,
     heuristic: Callable[[Stop, Stop], float],
+    heuristic_weight: float,
 ) -> SearchResult:
     costs: dict[Stop, float] = {start: 0}
     came_from: dict[Stop, Optional[Route]] = {start: None}
@@ -39,7 +40,7 @@ def astar_time(
                 costs[end_stop] = route_cost
                 came_from[end_stop] = route
 
-                priority = route_cost + heuristic(end_stop, end)
+                priority = route_cost + heuristic(end_stop, end) * heuristic_weight
                 pq.put((priority, end_stop))
 
     return SearchResult(costs, came_from, visited_stops_counter)
@@ -91,9 +92,8 @@ def astar_change(
     end: Stop,
     departure_min: int,
     heuristic: Callable[[Stop, Stop], float],
+    heuristic_weight: float,
 ) -> SearchResult:
-    # this will be used to evaluate each route less greedy.
-    lines_arriving_to_end: set[str] = graph.get_arriving_line_names(end)
 
     costs: dict[Stop, float] = {start: 0}
     came_from: dict[Stop, Optional[Route]] = {start: None}
@@ -111,9 +111,12 @@ def astar_change(
         if curr_stop == end:
             break
 
-        for route in sorted(graph.departures[curr_stop], key=lambda route: graph):
+        # sort all departing routes in order to check the ones directly connected with end stop first
+        for route in sorted(
+            graph.departures[curr_stop],
+            key=lambda route: not graph.is_route_arriving(route, end),
+        ):
             end_stop: Stop = route.end_stop
-
             route_cost = curr_cost + (
                 prev_route is not None and prev_route.line != route.line
             )
@@ -122,7 +125,7 @@ def astar_change(
                 costs[end_stop] = route_cost
                 came_from[end_stop] = route
 
-                priority = route_cost + heuristic(end_stop, end)
+                priority = route_cost + heuristic(end_stop, end) * heuristic_weight
                 pq.put((priority, end_stop))
 
     return SearchResult(costs, came_from, visited_stops_counter)
@@ -132,21 +135,27 @@ def create_astar(
     heuristic: Callable[[Stop, Stop], float], mode: str
 ) -> Callable[[Graph, Stop, Stop, int], SearchResult]:
 
+    if mode == "t":
+        heuristic_weight: float = 5
+    elif mode == "p":
+        heuristic_weight: float = 1
+    else:
+        raise ValueError(f"Invalid mode for creating astar: {mode}")
+
     @route_info_decorator
     def partially_applied_astar_time(
         graph: Graph, start: Stop, end: Stop, departure_min: int
     ) -> SearchResult:
-        return astar_time(graph, start, end, departure_min, heuristic)
+        return astar_time(graph, start, end, departure_min, heuristic, heuristic_weight)
 
     @route_info_decorator
     def partially_applied_astar_change(
         graph: Graph, start: Stop, end: Stop, departure_min: int
     ) -> SearchResult:
-        return astar_change(graph, start, end, departure_min, heuristic)
+        return astar_change(
+            graph, start, end, departure_min, heuristic, heuristic_weight
+        )
 
-    if mode == "t":
-        return partially_applied_astar_time
-    elif mode == "p":
-        return partially_applied_astar_change
-
-    raise ValueError(f"Invalid mode for creating astar: {mode}")
+    return (
+        partially_applied_astar_time if mode == "t" else partially_applied_astar_change
+    )

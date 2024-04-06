@@ -5,16 +5,31 @@ from process_data import get_graph
 from algorithms import dijkstra, create_astar, manhattan_distance, haversine_distance
 
 
-def run_menu():
-    graph = get_graph()
-
-    stops_dict: dict[str, Stop] = {str(stop): stop for stop in graph.departures}
+def test_all_functions(graph, start, end, departure_min):
     modes = {
         "dijkstra-time": dijkstra,
         "astar-time-manhattan": create_astar(manhattan_distance, "t"),
         "astar-time-haversine": create_astar(haversine_distance, "t"),
         "astar-change-manhattan": create_astar(manhattan_distance, "p"),
         "astar-change-haversine": create_astar(haversine_distance, "p"),
+    }
+
+    for search_function in modes.values():
+        search_function(graph, start, end, departure_min)
+
+
+def run_menu():
+    graph = get_graph()
+
+    stops_dict: dict[str, Stop] = {str(stop): stop for stop in graph.departures}
+
+    modes = {
+        "dijkstra-time": dijkstra,
+        "astar-time-manhattan": create_astar(manhattan_distance, "t"),
+        "astar-time-haversine": create_astar(haversine_distance, "t"),
+        "astar-change-manhattan": create_astar(manhattan_distance, "p"),
+        "astar-change-haversine": create_astar(haversine_distance, "p"),
+        "test-all-functions": test_all_functions,
     }
 
     while True:

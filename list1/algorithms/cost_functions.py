@@ -23,7 +23,7 @@ def minutes_cost(
 def manhattan_distance(start: Stop, end: Stop) -> float:
     distance = abs(end.lat - start.lat) + abs(end.lon - start.lon)
 
-    return distance * 10
+    return distance
 
 
 def haversine_distance(stop1: Stop, stop2: Stop) -> float:
@@ -44,4 +44,4 @@ def haversine_distance(stop1: Stop, stop2: Stop) -> float:
     radius_of_earth_km = 6371.0
     distance_km = radius_of_earth_km * c
 
-    return distance_km * 3
+    return distance_km

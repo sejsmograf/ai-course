@@ -1,3 +1,6 @@
+import logging
+from functools import wraps
+from re import search
 import sys
 import time
 from typing import NamedTuple, Optional, Callable
@@ -12,7 +15,11 @@ class SearchResult(NamedTuple):
 
 
 def route_info_decorator(search_func: Callable[[Graph, Stop, Stop, int], SearchResult]):
+    @wraps(search_func)
     def wrapper(graph: Graph, start: Stop, end: Stop, departure_min: int):
+        print("\n")
+        logging.info(f"Running {search.__name__}, from {start.name} to {end.name}\n")
+
         start_time: float = time.time()
         result: SearchResult = search_func(graph, start, end, departure_min)
         end_time: float = time.time()

@@ -59,7 +59,7 @@ class Graph:
         if route.end_stop not in self.departures:
             self.departures[route.end_stop] = []
             self.arriving_line_names[route.end_stop] = set()
-            self.departing_line_names[route.start_stop] = set()
+            self.departing_line_names[route.end_stop] = set()
 
         self.departures[route.start_stop].append(route)
         self.arriving_line_names[route.end_stop].add(route.line)
