@@ -5,8 +5,6 @@ from .serialize import serialize, deserialize
 from .read_csv import get_data
 from .utils import minutes_from_str
 
-logging.basicConfig(level=logging.INFO)
-
 
 SERIALIZED_GRAPH_PATH = (
     Path(__file__).resolve().parent.parent / "data/serialized_graph.pickle"
@@ -60,6 +58,7 @@ def create_graph(data: list[dict[str, str]]) -> Graph:
 
 
 def get_graph(serialized_path: Path = SERIALIZED_GRAPH_PATH):
+
     if serialized_path.exists():
         logging.info(f"Found serialized graph: {serialized_path}")
         logging.info(f"Loading serialized graph")

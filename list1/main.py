@@ -1,3 +1,4 @@
+import logging
 import sys
 from terminal_menu import run_menu
 from process_data import Stop, Graph, minutes_from_str, get_graph
@@ -5,18 +6,22 @@ from algorithms import dijkstra
 from datetime import datetime
 import argparse
 
+logging.basicConfig(
+    level=logging.INFO, format="%(levelname)s - %(filename)s - %(message)s"
+)
+
 
 def valid_time(s: str):
     try:
         _ = datetime.strptime(s, "%H:%M:%S")
         return s
     except:
-        raise argparse.ArgumentTypeError("Czas musi być w formacie H:M:S")
+        raise argparse.ArgumentTypeError("Time should have format H:M:S")
 
 
 if __name__ == "__main__":
     if len(sys.argv) == 1:  # run menu if no args passed
-        print("No arguments passed, running terminal menu \n")
+        logging.warning("No arguments passed, running terminal menu \n")
         run_menu()
         exit()
 

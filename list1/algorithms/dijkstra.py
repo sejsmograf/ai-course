@@ -1,3 +1,4 @@
+import logging
 from queue import PriorityQueue
 from typing import Optional
 from .cost_functions import minutes_cost
