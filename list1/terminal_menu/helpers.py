@@ -22,7 +22,6 @@ def prompt_time(prompt_str: str) -> int:
 
     hour: int = int(time_str[:2])
     if int(time_str[:2]) < 4:
-        print("sejMO")
         time_str = str(hour + 24) + time_str[2:]
 
     return minutes_from_str(time_str)

@@ -4,7 +4,7 @@ def minutes_from_str(time_str: str) -> int:
 
 
 def minutes_to_str(time_minutes: int) -> str:
-    hours = time_minutes // 60
+    hours = (time_minutes // 60) % 24
     minutes = time_minutes % 60
     seconds = 0
 

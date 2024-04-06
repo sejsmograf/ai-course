@@ -27,13 +27,13 @@ def route_from_dict(row: dict[str, str]) -> Route:
     arrival = row[ARRIVAL]
     start = row[START]
     end = row[END]
-    start_lat = row[START_LAT]
-    start_lon = row[START_LON]
-    end_lat = row[END_LAT]
-    end_lon = row[END_LON]
+    start_lat = float(row[START_LAT])
+    start_lon = float(row[START_LON])
+    end_lat = float(row[END_LAT])
+    end_lon = float(row[END_LON])
 
-    start_stop = Stop(start)
-    end_stop = Stop(end)
+    start_stop = Stop(start, start_lat, start_lon)
+    end_stop = Stop(end, end_lat, end_lon)
 
     return Route(
         line,
@@ -41,10 +41,10 @@ def route_from_dict(row: dict[str, str]) -> Route:
         end_stop,
         minutes_from_str(departure),
         minutes_from_str(arrival),
-        float(start_lat),
-        float(start_lon),
-        float(end_lat),
-        float(end_lon),
+        start_lat,
+        start_lon,
+        end_lat,
+        end_lon,
     )
 
 
@@ -58,7 +58,6 @@ def create_graph(data: list[dict[str, str]]) -> Graph:
 
 
 def get_graph(serialized_path: Path = SERIALIZED_GRAPH_PATH):
-
     if serialized_path.exists():
         logging.info(f"Found serialized graph: {serialized_path}")
         logging.info(f"Loading serialized graph")

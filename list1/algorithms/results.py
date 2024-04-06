@@ -8,23 +8,28 @@ from process_data import Stop, Route, Graph, minutes_to_str
 class SearchResult(NamedTuple):
     costs: dict[Stop, float]
     came_from: dict[Stop, Optional[Route]]
+    visited_stops: int
 
 
-def show_route_info(search_func: Callable[[Graph, Stop, Stop, int], SearchResult]):
+def route_info_decorator(search_func: Callable[[Graph, Stop, Stop, int], SearchResult]):
     def wrapper(graph: Graph, start: Stop, end: Stop, departure_min: int):
         start_time: float = time.time()
         result: SearchResult = search_func(graph, start, end, departure_min)
         end_time: float = time.time()
 
-        found_path: list[Route] = get_path(result, end)
+        found_path: list[Route] = reconstruct_path(result, end)
         print_path(found_path)
 
-        sys.stderr.write(f"Czas obliczeń: {end_time - start_time:.4f}")
+        sys.stderr.write(f"\nCost function value: {result.costs[end]}")
+        sys.stderr.write(f"\nVisited {result.visited_stops} stops before finishing")
+        sys.stderr.write(f"\nSearch time: {end_time - start_time:.4f}s\n")
+
+        return result
 
     return wrapper
 
 
-def get_path(search_result: SearchResult, end: Stop) -> list[Route]:
+def reconstruct_path(search_result: SearchResult, end: Stop) -> list[Route]:
     came_from: dict[Stop, Optional[Route]] = search_result.came_from
     path: list[Route] = []
     current_stop: Stop = end
