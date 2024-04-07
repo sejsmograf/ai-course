@@ -45,44 +45,44 @@ def astar_time(
     return SearchResult(costs, came_from, end, visited_stops_counter)
 
 
-# def astar_change(
-#     graph: Graph,
-#     start: Stop,
-#     end: Stop,
-#     departure_min: int,
-#     heuristic: Callable[[Stop, Stop], float],
-# ) -> SearchResult:
-#     costs: dict[Stop, float] = {start: 0}
-#     came_from: dict[Stop, Optional[Route]] = {start: None}
-#
-#
-#     pq: PriorityQueue[tuple[float, Stop]] = PriorityQueue()
-#     pq.put((0, start))
-#
-#     visited_stops_counter: int = 0
-#     while not pq.empty():
-#         visited_stops_counter += 1
-#         _, curr_stop = pq.get()
-#         curr_cost = costs[curr_stop]
-#         prev_route: Optional[Route] = came_from[curr_stop]
-#
-#         if curr_stop == end:
-#             break
-#
-#         for route in graph.departures[curr_stop]:
-#             end_stop: Stop = route.end_stop
-#             route_cost = curr_cost + (
-#                 prev_route is not None and prev_route.line != route.line
-#             )
-#
-#             if end_stop not in costs or route_cost < costs[end_stop]:
-#                 costs[end_stop] = route_cost
-#                 came_from[end_stop] = route
-#
-#                 priority = route_cost + heuristic(end_stop, end)
-#                 pq.put((priority, end_stop))
-#
-#     return SearchResult(costs, came_from, end, visited_stops_counter)
+def astar_change_naive(
+    graph: Graph,
+    start: Stop,
+    end: Stop,
+    departure_min: int,
+    heuristic: Callable[[Stop, Stop], float],
+    heuristic_weight: float,
+) -> SearchResult:
+    costs: dict[Stop, float] = {start: 0}
+    came_from: dict[Stop, Optional[Route]] = {start: None}
+
+    pq: PriorityQueue[tuple[float, Stop]] = PriorityQueue()
+    pq.put((0, start))
+
+    visited_stops_counter: int = 0
+    while not pq.empty():
+        visited_stops_counter += 1
+        _, curr_stop = pq.get()
+        curr_cost = costs[curr_stop]
+        prev_route: Optional[Route] = came_from[curr_stop]
+
+        if curr_stop == end:
+            break
+
+        for route in graph.departures[curr_stop]:
+            end_stop: Stop = route.end_stop
+            route_cost = curr_cost + (
+                prev_route is not None and prev_route.line != route.line
+            )
+
+            if end_stop not in costs or route_cost < costs[end_stop]:
+                costs[end_stop] = route_cost
+                came_from[end_stop] = route
+
+                priority = route_cost + heuristic(end_stop, end) * heuristic_weight
+                pq.put((priority, end_stop))
+
+    return SearchResult(costs, came_from, end, visited_stops_counter)
 
 
 def astar_change(
@@ -151,8 +151,8 @@ def create_astar(
 ) -> Callable[[Graph, Stop, Stop, int], SearchResult]:
 
     if mode == "t":
-        heuristic_weight: float = 30
-    elif mode == "p":
+        heuristic_weight: float = 20
+    elif mode == "p" or mode == "p-naive":
         heuristic_weight: float = 0.5
 
     else:
@@ -170,8 +170,24 @@ def create_astar(
             graph, start, end, departure_min, heuristic, heuristic_weight
         )
 
-    astar = (
-        partially_applied_astar_time if mode == "t" else partially_applied_astar_change
-    )
+    def partially_applied_astar_change_naive(
+        graph: Graph, start: Stop, end: Stop, departure_min: int
+    ) -> SearchResult:
+        return astar_change_naive(
+            graph, start, end, departure_min, heuristic, heuristic_weight
+        )
 
-    return route_info_decorator(astar) if print_result else astar
+    astar = None
+    function_name: str
+
+    if mode == "t":
+        astar = partially_applied_astar_time
+        function_name = "Astar - prioritize time"
+    elif mode == "p":
+        astar = partially_applied_astar_change
+        function_name = "Astar - prioritize changes improved"
+    elif mode == "p-naive":
+        astar = partially_applied_astar_change_naive
+        function_name = "Astar - prioritize changes naive"
+
+    return route_info_decorator(astar, function_name) if print_result else astar

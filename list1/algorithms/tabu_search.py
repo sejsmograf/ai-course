@@ -1,4 +1,9 @@
-from .results import SearchResult, print_path, reconstruct_path
+from itertools import permutations
+from .results import (
+    SearchResult,
+    TabuSearchResult,
+    tabu_route_info_decorator,
+)
 from typing import Callable
 from process_data import Graph, Route, Stop
 from .astar import create_astar
@@ -6,9 +11,9 @@ from .astar import create_astar
 
 def create_path_between_stops(
     graph, to_visit: list[Stop], departure_min: int, search_function: Callable
-) -> list[SearchResult]:
-    came_from = []
-    total_cost = 0
+) -> TabuSearchResult:
+    came_from: list[SearchResult] = []
+    total_cost: float = 0
     current_min: int = departure_min
 
     for i in range(len(to_visit) - 1):
@@ -16,45 +21,79 @@ def create_path_between_stops(
         end_stop: Stop = to_visit[i + 1]
         result: SearchResult = search_function(graph, start_stop, end_stop, current_min)
         arrival_min: int = result.came_from[end_stop].arrival_min
+        total_cost += result.costs[end_stop]
         came_from.append(result)
         current_min = arrival_min
 
-    return came_from
+    return TabuSearchResult(came_from, to_visit, total_cost)
 
 
-def tabu(
+def get_neighbors(current_solution: list[Stop]) -> list[list[Stop]]:
+    neighbors: list[list[Stop]] = []
+
+    for i in range(len(current_solution)):
+        for j in range(i + 1, len(current_solution)):
+            neighbor: list[Stop] = current_solution[:]
+            neighbor[i], neighbor[j] = neighbor[j], neighbor[i]
+            neighbors.append(neighbor)
+
+    return neighbors
+
+
+def tabu_search(
     graph: Graph,
     start: Stop,
     to_visit: list[Stop],
     departure_min: int,
     search_function: Callable,
-) -> SearchResult:
-    results = create_path_between_stops(
+    max_iterations: int,
+) -> TabuSearchResult:
+    # calculate initial solution
+    best_so_far: TabuSearchResult = create_path_between_stops(
         graph, [start] + to_visit + [start], departure_min, search_function
     )
 
-    for result in results:
-        path = reconstruct_path(result)
-        print_path(path)
-        print("\n\n")
+    return best_so_far
 
 
 def create_tabu(
     heuristic: Callable[[Stop, Stop], float], mode: str
-) -> Callable[[Graph, Stop, list[Stop], int], SearchResult]:
+) -> Callable[[Graph, Stop, list[Stop], int], TabuSearchResult]:
+    DEFAULT_MAX_ITERATIONS = 10
 
     search_function: Callable = create_astar(heuristic, mode, print_result=False)
 
     def partially_applied_tabu_time(
         graph: Graph, start: Stop, to_visit: list[Stop], departure_min: int
-    ) -> SearchResult:
-        return tabu(graph, start, to_visit, departure_min, search_function)
+    ) -> TabuSearchResult:
+        return tabu_search(
+            graph,
+            start,
+            to_visit,
+            departure_min,
+            search_function,
+            DEFAULT_MAX_ITERATIONS,
+        )
 
     def partially_applied_tabu_changes(
         graph: Graph, start: Stop, to_visit: list[Stop], departure_min: int
-    ) -> SearchResult:
-        return tabu(graph, start, to_visit, departure_min, search_function)
+    ) -> TabuSearchResult:
+        return tabu_search(
+            graph,
+            start,
+            to_visit,
+            departure_min,
+            search_function,
+            DEFAULT_MAX_ITERATIONS,
+        )
 
-    return (
-        partially_applied_tabu_time if mode == "t" else partially_applied_tabu_changes
-    )
+    if mode == "t":
+        chosen_tabu = partially_applied_tabu_time
+        function_name = "Tabu without constraints - prioritize time"
+    elif mode == "p":
+        chosen_tabu = partially_applied_tabu_changes
+        function_name = "Tabu without constraints - prioritize time"
+    else:
+        raise ValueError(f"Invalid mode {mode}")
+
+    return tabu_route_info_decorator(chosen_tabu, function_name)

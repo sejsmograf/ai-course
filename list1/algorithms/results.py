@@ -7,6 +7,12 @@ from process_data.utils import minutes_to_str
 from process_data import Stop, Route, Graph, minutes_to_str
 
 
+class TabuSearchResult(NamedTuple):
+    results: list["SearchResult"]
+    to_visit: list[Stop]
+    total_cost: float
+
+
 class SearchResult(NamedTuple):
     costs: dict[Stop, float]
     came_from: dict[Stop, Optional[Route]]
@@ -14,13 +20,17 @@ class SearchResult(NamedTuple):
     visited_stops: int
 
 
-def route_info_decorator(search_func: Callable[[Graph, Stop, Stop, int], SearchResult]):
+def route_info_decorator(
+    search_func: Callable[[Graph, Stop, Stop, int], SearchResult],
+    func_name: Optional[str] = None,
+):
+    if func_name is None:
+        func_name = search_func.__name__
+
     @wraps(search_func)
     def wrapper(graph: Graph, start: Stop, end: Stop, departure_min: int):
         print("\n")
-        logging.info(
-            f"Running {search_func.__name__}, from {start.name} to {end.name}\n"
-        )
+        logging.info(f"Running {func_name}, from {start.name} to {end.name}\n")
 
         start_time: float = time.time()
         result: SearchResult = search_func(graph, start, end, departure_min)
@@ -36,6 +46,46 @@ def route_info_decorator(search_func: Callable[[Graph, Stop, Stop, int], SearchR
 
         sys.stderr.write(f"\nCost function value: {result.costs[end]}")
         sys.stderr.write(f"\nVisited {result.visited_stops} stops before finishing")
+        sys.stderr.write(f"\nSearch time: {end_time - start_time:.4f}s\n")
+
+        return result
+
+    return wrapper
+
+
+def tabu_route_info_decorator(
+    search_func: Callable[[Graph, Stop, list[Stop], int], TabuSearchResult],
+    func_name: Optional[str] = None,
+):
+    if func_name is None:
+        func_name = search_func.__name__
+
+    @wraps(search_func)
+    def wrapper(graph: Graph, start: Stop, to_visit: list[Stop], departure_min: int):
+        print("\n")
+        logging.info(
+            f"Running {func_name}, from {start.name} between {[stop.name for stop in to_visit]}\n"
+        )
+
+        start_time: float = time.time()
+        result: TabuSearchResult = search_func(graph, start, to_visit, departure_min)
+        end_time: float = time.time()
+
+        print("Found solution is to visit the stops in order:")
+        print((" -> ").join([stop.name for stop in result.to_visit]))
+
+        try:
+            for i in range(len(result.results)):
+                print(f"Path to {result.to_visit[i+1].name}")
+                found_path: list[Route] = reconstruct_path(result.results[i])
+                print_path(found_path)
+                print()
+
+        except Exception as e:
+            logging.error(e)
+            return
+
+        sys.stderr.write(f"\nCost function value: {result.total_cost}")
         sys.stderr.write(f"\nSearch time: {end_time - start_time:.4f}s\n")
 
         return result
