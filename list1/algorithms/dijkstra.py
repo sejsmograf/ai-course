@@ -33,4 +33,4 @@ def dijkstra(graph: Graph, start: Stop, end: Stop, departure_min: int) -> Search
                 came_from[end_stop] = route
                 pq.put((route_cost, end_stop))
 
-    return SearchResult(costs, came_from, visited_stops_counter)
+    return SearchResult(costs, came_from, end, visited_stops_counter)

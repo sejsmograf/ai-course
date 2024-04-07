@@ -64,8 +64,10 @@ def get_graph(serialized_path: Path = SERIALIZED_GRAPH_PATH):
         graph = deserialize(serialized_path)
         return graph
 
+    logging.warning(f"Serialized graph not found, loading data from csv")
     data: list[dict[str, str]] = get_data()
-    logging.info("Creating graph")
+
+    logging.info("Data loaded, creating graph")
     graph = create_graph(data)
 
     logging.info(f"Serializing graph: {serialized_path}")

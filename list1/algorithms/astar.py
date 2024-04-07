@@ -1,4 +1,3 @@
-from functools import partial
 from queue import PriorityQueue
 from .results import SearchResult, route_info_decorator
 from typing import Callable, Optional
@@ -43,7 +42,7 @@ def astar_time(
                 priority = route_cost + heuristic(end_stop, end) * heuristic_weight
                 pq.put((priority, end_stop))
 
-    return SearchResult(costs, came_from, visited_stops_counter)
+    return SearchResult(costs, came_from, end, visited_stops_counter)
 
 
 # def astar_change(
@@ -83,7 +82,7 @@ def astar_time(
 #                 priority = route_cost + heuristic(end_stop, end)
 #                 pq.put((priority, end_stop))
 #
-#     return SearchResult(costs, came_from, visited_stops_counter)
+#     return SearchResult(costs, came_from, end, visited_stops_counter)
 
 
 def astar_change(
@@ -112,9 +111,25 @@ def astar_change(
             break
 
         # sort all departing routes in order to check the ones directly connected with end stop first
+        # also take into account the arrival time
+        def sort_key(route: Route) -> int:
+            # Priorityize direct connetion over minutes
+            DIRECT_CONNECTION_WEIGHT = 10000
+
+            minutes_to_arrive: int = minutes_cost(
+                prev_route,
+                route,
+                (prev_route.arrival_min if prev_route is not None else departure_min),
+            )
+            no_direct_connection: bool = not graph.is_direct_connection(route, end)
+
+            if minutes_to_arrive < 0:
+                print(minutes_to_arrive)
+
+            return no_direct_connection * DIRECT_CONNECTION_WEIGHT + minutes_to_arrive
+
         for route in sorted(
-            graph.departures[curr_stop],
-            key=lambda route: not graph.is_route_arriving(route, end),
+            graph.departures[curr_stop], key=lambda route: sort_key(route)
         ):
             end_stop: Stop = route.end_stop
             route_cost = curr_cost + (
@@ -128,27 +143,26 @@ def astar_change(
                 priority = route_cost + heuristic(end_stop, end) * heuristic_weight
                 pq.put((priority, end_stop))
 
-    return SearchResult(costs, came_from, visited_stops_counter)
+    return SearchResult(costs, came_from, end, visited_stops_counter)
 
 
 def create_astar(
-    heuristic: Callable[[Stop, Stop], float], mode: str
+    heuristic: Callable[[Stop, Stop], float], mode: str, print_result: bool = True
 ) -> Callable[[Graph, Stop, Stop, int], SearchResult]:
 
     if mode == "t":
-        heuristic_weight: float = 5
+        heuristic_weight: float = 30
     elif mode == "p":
-        heuristic_weight: float = 1
+        heuristic_weight: float = 0.5
+
     else:
         raise ValueError(f"Invalid mode for creating astar: {mode}")
 
-    @route_info_decorator
     def partially_applied_astar_time(
         graph: Graph, start: Stop, end: Stop, departure_min: int
     ) -> SearchResult:
         return astar_time(graph, start, end, departure_min, heuristic, heuristic_weight)
 
-    @route_info_decorator
     def partially_applied_astar_change(
         graph: Graph, start: Stop, end: Stop, departure_min: int
     ) -> SearchResult:
@@ -156,6 +170,8 @@ def create_astar(
             graph, start, end, departure_min, heuristic, heuristic_weight
         )
 
-    return (
+    astar = (
         partially_applied_astar_time if mode == "t" else partially_applied_astar_change
     )
+
+    return route_info_decorator(astar) if print_result else astar

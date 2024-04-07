@@ -1,6 +1,5 @@
 import logging
 from functools import wraps
-from re import search
 import sys
 import time
 from typing import NamedTuple, Optional, Callable
@@ -11,6 +10,7 @@ from process_data import Stop, Route, Graph, minutes_to_str
 class SearchResult(NamedTuple):
     costs: dict[Stop, float]
     came_from: dict[Stop, Optional[Route]]
+    end_stop: Stop
     visited_stops: int
 
 
@@ -18,13 +18,20 @@ def route_info_decorator(search_func: Callable[[Graph, Stop, Stop, int], SearchR
     @wraps(search_func)
     def wrapper(graph: Graph, start: Stop, end: Stop, departure_min: int):
         print("\n")
-        logging.info(f"Running {search.__name__}, from {start.name} to {end.name}\n")
+        logging.info(
+            f"Running {search_func.__name__}, from {start.name} to {end.name}\n"
+        )
 
         start_time: float = time.time()
         result: SearchResult = search_func(graph, start, end, departure_min)
         end_time: float = time.time()
 
-        found_path: list[Route] = reconstruct_path(result, end)
+        try:
+            found_path: list[Route] = reconstruct_path(result)
+        except Exception as e:
+            logging.error(e)
+            return
+
         print_path(found_path)
 
         sys.stderr.write(f"\nCost function value: {result.costs[end]}")
@@ -36,8 +43,13 @@ def route_info_decorator(search_func: Callable[[Graph, Stop, Stop, int], SearchR
     return wrapper
 
 
-def reconstruct_path(search_result: SearchResult, end: Stop) -> list[Route]:
+def reconstruct_path(search_result: SearchResult) -> list[Route]:
+    end: Stop = search_result.end_stop
     came_from: dict[Stop, Optional[Route]] = search_result.came_from
+
+    if end not in came_from:
+        raise Exception("Path not found")
+
     path: list[Route] = []
     current_stop: Stop = end
 

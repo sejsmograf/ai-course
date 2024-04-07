@@ -3,12 +3,30 @@ from process_data import minutes_from_str
 
 
 def prompt(options, title):
+    terminal_menu = TerminalMenu(options, title=title)
     result = None
     while result is None:
-        terminal_menu = TerminalMenu(options, title=title)
         result = terminal_menu.show()
 
     return options[result]
+
+
+def prompt_many(options, title):
+    terminal_menu = TerminalMenu(
+        options,
+        multi_select=True,
+        show_multi_select_hint=True,
+        multi_select_empty_ok=False,
+        title=title,
+    )
+    terminal_menu.show()
+
+    return [options[idx] for idx in terminal_menu.chosen_menu_indices]
+
+
+def prompt_many_dict(options_dict: dict, title: str):
+    selected = prompt_many(list(options_dict.keys()), title)
+    return [options_dict[option] for option in selected]
 
 
 def prompt_dict(options_dict: dict, title: str):
