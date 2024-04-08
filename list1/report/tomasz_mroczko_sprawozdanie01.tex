@@ -222,7 +222,7 @@ class Graph:
 
 
 \section{Zadanie 1}
-  \subsection{a) Dijkstra - kryterium czasu}
+  \subsection{Dijkstra - kryterium czasu}
   \subsubsection{Opis} Celem było zaimplementowanie algorytmu dijkstry, który
   znajduje najkrótszą ścieżkę pomiędzy dwoma przystankami, biorąc pod uwagę \textit{jedynie}
   czas podróży. 
@@ -316,7 +316,7 @@ def minutes_cost(
   optymalizacja czasu dojazdu lokalnie jest jednoznaczna, i nie powinna uniemożliwić dotarcia do celu 
   optymalną trasą (zawsze możemy przesiąść się do optymalnej linii).
 
-  \subsection{b) A* - kryterium czasu}
+  \subsection{A* - kryterium czasu}
 
   \subsubsection{Opis}
   Algorytm ten jest rozszszeniem algorytmu Dijkstry, który w celu szybszego znalezienia 
@@ -467,7 +467,7 @@ def create_astar(
   względem algorytmu Dijkstry.
 
 
-  \subsection{c) A* - kryterium przesiadek}
+  \subsection{A* - kryterium przesiadek}
 
   \subsubsection{Opis}
   Algorytm A* z kryterium przesiadek, różni się od algorytmu A* z kryterium czasu jedynie w sposobie
@@ -498,7 +498,7 @@ route_cost = curr_cost + (
   podróży oraz liczby przesiadek. Brak znajomości kontekstu globalnego oraz 
   potencjalnych przesiadek w przyszłości prowadzi do nieoptymalnych wyników.
 
-  \subsection{d) Modyfikacja algorytmu A*}
+  \subsection{Modyfikacja algorytmu A*}
 
   \subsubsection{Opis}
   Modyfikacja została dodana do algorytmy A* z kryterium przesiadek, 
@@ -738,7 +738,7 @@ def create_path_between_stops(
 \end{itemize}
 
 
-\subsection{Dobór tługości listy T}
+\subsection{Dobór długości listy T}
     \subsubsection{Opis}
     W tym kroku, dodano do algorytmu parametr, który pozwala na ograniczenie długości listy tabu.
     Rozwiązanie takie, pomaga zredukować użycie pamięci oraz uniknąć zatrzymania w pewnym obszarze poszukiwań.

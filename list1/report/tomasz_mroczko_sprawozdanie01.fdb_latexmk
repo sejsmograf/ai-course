@@ -1,5 +1,5 @@
 # Fdb version 4
-["pdflatex"] 1712584927 "c:/Users/tomek/UCZELNIA/SemestrVI/ai/s1/tomasz_mroczko_sprawozdanie01.tex" "tomasz_mroczko_sprawozdanie01.pdf" "tomasz_mroczko_sprawozdanie01" 1712584930 0
+["pdflatex"] 1712595979 "c:/Users/tomek/UCZELNIA/SemestrVI/ai/s1/tomasz_mroczko_sprawozdanie01.tex" "tomasz_mroczko_sprawozdanie01.pdf" "tomasz_mroczko_sprawozdanie01" 1712595982 0
   "2024-04-07-12-54-53.png" 1712487294 75238 a5f530c480bc0491612f1bae629d938b ""
   "2024-04-07-12-58-54.png" 1712487534 60353 611f56581bd7ab0de248555472cce9f5 ""
   "2024-04-07-13-00-26.png" 1712487627 52022 7417cb8ad42ed50cdba8e89df757e25a ""
@@ -8,7 +8,7 @@
   "2024-04-08-06-14-05.png" 1712549645 39271 0514f04110e4f1f32712c711b3c1fee3 ""
   "2024-04-08-07-36-38.png" 1712554599 98727 d4e6c6bf80958a7eda743305cf60aca5 ""
   "2024-04-08-07-48-31.png" 1712555312 56193 ef854a43549143b48eb77b472e8c7faa ""
-  "c:/Users/tomek/UCZELNIA/SemestrVI/ai/s1/tomasz_mroczko_sprawozdanie01.tex" 1712584927 31199 cfcbc10d964a661189f7384af3980112 ""
+  "c:/Users/tomek/UCZELNIA/SemestrVI/ai/s1/tomasz_mroczko_sprawozdanie01.tex" 1712595975 31187 559b1db1d97b4524cabea090c6820ecb ""
   "c:/texlive/2023/texmf-dist/fonts/enc/dvips/cm-super/cm-super-t1.enc" 1697192264 2971 def0b6c1f0b107b3b936def894055589 ""
   "c:/texlive/2023/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc" 1697192264 2900 1537cc8184ad1792082cd229ecc269f4 ""
   "c:/texlive/2023/texmf-dist/fonts/map/fontname/texfonts.map" 1697193037 3524 cb3e574dea2d1052e39280babc910dc8 ""
@@ -126,10 +126,10 @@
   "c:/texlive/2023/texmf-var/web2c/pdftex/pdflatex.fmt" 1697196464 8195436 96a0b540c1497157ae20d99c811a9bc1 ""
   "c:/texlive/2023/texmf.cnf" 1697196231 713 e69b156964470283e0530f5060668171 ""
   "images/logo.png" 1697260768 25083 2eb0cd6cf67e91cf9f6da48853ea3519 ""
-  "tomasz_mroczko_sprawozdanie01.aux" 1712584930 4809 441e8800216f983e4f641ba229dcbb2e "pdflatex"
-  "tomasz_mroczko_sprawozdanie01.out" 1712584930 4392 294ab05a88ac3844071658fbd72c13ed "pdflatex"
-  "tomasz_mroczko_sprawozdanie01.tex" 1712584927 31199 cfcbc10d964a661189f7384af3980112 ""
-  "tomasz_mroczko_sprawozdanie01.toc" 1712584930 2831 9624f8258cfcf89875e6e0241514a12f "pdflatex"
+  "tomasz_mroczko_sprawozdanie01.aux" 1712595981 4797 b388efa9411f671d3b18e920ad50721e "pdflatex"
+  "tomasz_mroczko_sprawozdanie01.out" 1712595981 4308 dd8ee48f623e65722fc3132e1e86405f "pdflatex"
+  "tomasz_mroczko_sprawozdanie01.tex" 1712595975 31187 559b1db1d97b4524cabea090c6820ecb ""
+  "tomasz_mroczko_sprawozdanie01.toc" 1712595981 2819 4b192ed95821cc252291aee0be9eb32b "pdflatex"
   (generated)
   "tomasz_mroczko_sprawozdanie01.aux"
   "tomasz_mroczko_sprawozdanie01.log"

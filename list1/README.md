@@ -16,7 +16,7 @@ where you have to visit all stops in the network optimizing the cost of the path
 - **Choose priority** - choose between time and change as priority for the path
 
 ## Installation
-- ***(Recommended)** Create virtual pythjon environment and activate it
+- **(Recommended)** Create virtual python environment and activate it
 ```
 python3 -m venv env
 source env/bin/activate
