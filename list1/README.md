@@ -6,6 +6,9 @@ It uses Dijkstra's algorithm, and A* algorithm with different heuristics to find
 in Wroclaw's public transport network. There also is option for pseudo Traveling Salesman Problem utilizing A* algorithm
 where you have to visit all stops in the network optimizing the cost of the path.
 
+## Warning
+**This project can currently only be used on Linux distros.**
+
 ## Features
 
 - **Interactive terminal menu** - easy to use terminal menu to choose the algorithm and stops
@@ -28,5 +31,12 @@ pip install -r requirements.txt
 python3 main.py
 ```
 This is recommended way to run the program.
+Running it without arguments will start the interactive terminal menu.
+
+If you want to pass cli arguments, just refer to --usage or -h for argument description.
+
+
+**The first run of the program will uncompress .gz file, process it 
+and serialize the graph to .pickle file for faster loading in the future.**
 
 
