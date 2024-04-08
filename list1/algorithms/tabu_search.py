@@ -29,11 +29,12 @@ def create_path_between_stops(
 
 
 def get_neighbors(current_solution: list[Stop]) -> list[list[Stop]]:
-    neighbors: list[list[Stop]] = []
+    n = len(current_solution)
+    neighbors = []
 
-    for i in range(len(current_solution)):
-        for j in range(i + 1, len(current_solution)):
-            neighbor: list[Stop] = current_solution[:]
+    for i in range(1, n - 1):
+        for j in range(i + 1, n - 1):
+            neighbor = current_solution[:]
             neighbor[i], neighbor[j] = neighbor[j], neighbor[i]
             neighbors.append(neighbor)
 
@@ -49,17 +50,44 @@ def tabu_search(
     max_iterations: int,
 ) -> TabuSearchResult:
     # calculate initial solution
-    best_so_far: TabuSearchResult = create_path_between_stops(
+    best_solution: TabuSearchResult = create_path_between_stops(
         graph, [start] + to_visit + [start], departure_min, search_function
     )
+    current_solution = best_solution
 
-    return best_so_far
+    tabu_list: list[TabuSearchResult] = []
+
+    for _ in range(max_iterations):
+        neighbors = get_neighbors(current_solution.to_visit)
+        best_neighbor_solution = None
+        best_cost = float("inf")
+
+        for neighbor in neighbors:
+            if neighbor not in tabu_list:
+                neighbor_solution = create_path_between_stops(
+                    graph, neighbor, departure_min, search_function
+                )
+
+                if neighbor_solution.total_cost < best_cost:
+                    best_neighbor_solution = neighbor_solution
+                    best_cost = neighbor_solution.total_cost
+
+        if best_neighbor_solution is None:
+            break
+
+        current_solution = best_neighbor_solution
+        tabu_list.append(best_neighbor_solution)
+
+        if best_neighbor_solution.total_cost < best_solution.total_cost:
+            best_solution = best_neighbor_solution
+
+    return best_solution
 
 
 def create_tabu(
     heuristic: Callable[[Stop, Stop], float], mode: str
 ) -> Callable[[Graph, Stop, list[Stop], int], TabuSearchResult]:
-    DEFAULT_MAX_ITERATIONS = 10
+    DEFAULT_MAX_ITERATIONS = 5
 
     search_function: Callable = create_astar(heuristic, mode, print_result=False)
 

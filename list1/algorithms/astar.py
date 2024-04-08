@@ -93,9 +93,10 @@ def astar_change(
     heuristic: Callable[[Stop, Stop], float],
     heuristic_weight: float,
 ) -> SearchResult:
-
     costs: dict[Stop, float] = {start: 0}
     came_from: dict[Stop, Optional[Route]] = {start: None}
+
+    costs_minutes: dict[Stop, int] = {start: 0}
 
     pq: PriorityQueue[tuple[float, Stop]] = PriorityQueue()
     pq.put((0, start))
@@ -105,6 +106,7 @@ def astar_change(
         visited_stops_counter += 1
         _, curr_stop = pq.get()
         curr_cost = costs[curr_stop]
+        curr_minute_cost = costs_minutes[curr_stop]
         prev_route: Optional[Route] = came_from[curr_stop]
 
         if curr_stop == end:
@@ -116,15 +118,10 @@ def astar_change(
             # Priorityize direct connetion over minutes
             DIRECT_CONNECTION_WEIGHT = 10000
 
-            minutes_to_arrive: int = minutes_cost(
-                prev_route,
-                route,
-                (prev_route.arrival_min if prev_route is not None else departure_min),
+            minutes_to_arrive: int = curr_minute_cost + minutes_cost(
+                prev_route, route, departure_min + curr_minute_cost
             )
             no_direct_connection: bool = not graph.is_direct_connection(route, end)
-
-            if minutes_to_arrive < 0:
-                print(minutes_to_arrive)
 
             return no_direct_connection * DIRECT_CONNECTION_WEIGHT + minutes_to_arrive
 
@@ -138,6 +135,9 @@ def astar_change(
 
             if end_stop not in costs or route_cost < costs[end_stop]:
                 costs[end_stop] = route_cost
+                costs_minutes[end_stop] = curr_minute_cost + minutes_cost(
+                    prev_route, route, departure_min + curr_minute_cost
+                )
                 came_from[end_stop] = route
 
                 priority = route_cost + heuristic(end_stop, end) * heuristic_weight

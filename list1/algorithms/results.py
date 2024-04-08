@@ -12,6 +12,11 @@ class TabuSearchResult(NamedTuple):
     to_visit: list[Stop]
     total_cost: float
 
+    def __eq__(self, other):
+        if not isinstance(other, TabuSearchResult):
+            return False
+        return self.to_visit == other.to_visit
+
 
 class SearchResult(NamedTuple):
     costs: dict[Stop, float]
@@ -68,7 +73,14 @@ def tabu_route_info_decorator(
         )
 
         start_time: float = time.time()
-        result: TabuSearchResult = search_func(graph, start, to_visit, departure_min)
+        try:
+            result: TabuSearchResult = search_func(
+                graph, start, to_visit, departure_min
+            )
+        except Exception as e:
+            logging.error(e)
+            logging.error("Possible cause: couldn't find a way to one or many stops")
+            return
         end_time: float = time.time()
 
         print("Found solution is to visit the stops in order:")
@@ -81,7 +93,7 @@ def tabu_route_info_decorator(
                 print_path(found_path)
                 print()
 
-        except Exception as e:
+        except error as e:
             logging.error(e)
             return
 
