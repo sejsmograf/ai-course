@@ -12,7 +12,7 @@ where you have to visit all stops in the network optimizing the cost of the path
 - **Path from stop A to stop B** - find the shortest path between two stops using Dijkstra or A* algorithm
 - **Choose priority** - choose between time and change as priority for the path
 
-## Installation and usage
+## Installation
 - ***(Recommended)** Create virtual pythjon environment and activate it
 ```
 python3 -m venv env
@@ -22,10 +22,11 @@ source env/bin/activate
 ```
 pip install -r requirements.txt
 ```
+## Usage
 - Run the program
-Recommended way to run the program is to just run the main.py
 ```
-pip install -r requirements.txt
+python3 main.py
 ```
+This is recommended way to run the program.
 
 
