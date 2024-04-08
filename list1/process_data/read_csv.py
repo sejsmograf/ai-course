@@ -15,7 +15,6 @@ SERIALIZED_CSV_PATH: Path = PARENT_DIR_PATH / "data/serialized_connection_graph.
 def read_csv_to_dict(path: Path) -> list[dict[str, str]]:
     if not path.exists():
         gzip_path = path.with_suffix(".csv.gz")
-        print(gzip_path)
         if gzip_path.exists():
             logging.warning(f"CSV file '{path}' not found, uncompressing {gzip_path}")
 
