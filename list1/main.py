@@ -24,14 +24,7 @@ def valid_time(s: str):
         raise argparse.ArgumentTypeError("Time should have format H:M:S")
 
 
-if __name__ == "__main__":
-    setup_logging()
-
-    if len(sys.argv) == 1:  # run menu if no args passed
-        logging.warning("No arguments passed, running terminal menu \n")
-        run_menu()
-        exit()
-
+def get_modes():
     modes = {
         "dijkstra-time": dijkstra,
         "astar-time-manhattan": create_astar(manhattan_distance, "t"),
@@ -41,9 +34,13 @@ if __name__ == "__main__":
         "tabu-time": create_tabu(manhattan_distance, "t"),
         "tabu-changes": create_tabu(haversine_distance, "p"),
     }
+    return modes
+
+
+def parse_arguments():
+    modes = get_modes()
 
     parser = argparse.ArgumentParser()
-
     parser.add_argument("mode", choices=modes.keys(), help="Search mode")
     parser.add_argument("start_stop", type=str, help="Start stop")
     parser.add_argument("end_stop", type=str, help="End stop")
@@ -53,9 +50,20 @@ if __name__ == "__main__":
         help="Departur time",
     )
 
-    args = parser.parse_args()
+    return parser.parse_args()
 
-    selected_mode: Callable = modes[args.mode]
+
+def main():
+    setup_logging()
+
+    if len(sys.argv) == 1:  # run menu if no args passed
+        logging.warning("No arguments passed, running terminal menu \n")
+        run_menu()
+        exit()
+
+    args = parse_arguments()
+
+    selected_mode: Callable = get_modes()[args.mode]
     start_stop_name: str = args.start_stop
     end_stop_name: str = args.end_stop
     departure_time_min = minutes_from_str(args.current_time)
@@ -84,3 +92,7 @@ if __name__ == "__main__":
         raise ValueError("End stop doesn't exist")
 
     selected_mode(graph, start_stop, end_stop, departure_time_min)
+
+
+if __name__ == "__main__":
+    main()

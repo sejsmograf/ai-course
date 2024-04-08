@@ -33,7 +33,7 @@ def get_neighbors(current_solution: list[Stop]) -> list[list[Stop]]:
     neighbors = []
 
     for i in range(1, n - 1):
-        for j in range(i + 1, n - 1):
+        for j in range(i + 1, min(i + 3, n - 1)):
             neighbor = current_solution[:]
             neighbor[i], neighbor[j] = neighbor[j], neighbor[i]
             neighbors.append(neighbor)
@@ -49,7 +49,6 @@ def tabu_search(
     search_function: Callable,
     max_iterations: int,
 ) -> TabuSearchResult:
-    # calculate initial solution
     best_solution: TabuSearchResult = create_path_between_stops(
         graph, [start] + to_visit + [start], departure_min, search_function
     )
