@@ -738,6 +738,64 @@ def create_path_between_stops(
 \end{itemize}
 
 
+\subsection{Dobór tługości listy T}
+    \subsubsection{Opis}
+    W tym kroku, dodano do algorytmu parametr, który pozwala na ograniczenie długości listy tabu.
+    Rozwiązanie takie, pomaga zredukować użycie pamięci oraz uniknąć zatrzymania w pewnym obszarze poszukiwań.
+    Usunięcie starszych elementów z listy daje możliwość ponownego przeszukania obszaru, który był wcześniej
+    na liście tabu. 
+
+    \subsubsection{Kod}
+\begin{lstlisting}
+# def tabu_search(
+#     graph: Graph,
+#     start: Stop,
+#     to_visit: list[Stop],
+#     departure_min: int,
+#     search_function: Callable,
+#     max_iterations: int,
+    tabu_list_size: Optional[int] = None,
+# ) -> TabuSearchResult:
+#     best_solution: TabuSearchResult = create_path_between_stops(
+#         graph, [start] + to_visit + [start], departure_min, search_function
+#     )
+#     current_solution = best_solution
+# 
+#     tabu_list: list[TabuSearchResult] = []
+# 
+#     for _ in range(max_iterations):
+#         neighbors = get_neighbors(current_solution.to_visit)
+#         best_neighbor_solution = None
+#         best_cost = float("inf")
+# 
+#         for neighbor in neighbors:
+#             if neighbor not in tabu_list:
+#                 neighbor_solution = create_path_between_stops(
+#                     graph, neighbor, departure_min, search_function
+#                 )
+# 
+#                 if neighbor_solution.total_cost < best_cost:
+#                     best_neighbor_solution = neighbor_solution
+#                     best_cost = neighbor_solution.total_cost
+# 
+#         if best_neighbor_solution is None:
+#             break
+# 
+#         current_solution = best_neighbor_solution
+#         tabu_list.append(best_neighbor_solution)
+        if tabu_list_size and len(tabu_list) > tabu_list_size:
+            tabu_list.pop(0)
+# 
+#         if best_neighbor_solution.total_cost < best_solution.total_cost:
+#             best_solution = best_neighbor_solution
+# 
+#     return best_solution
+\end{lstlisting}
+Dodano parametr tabu\_list\_size, który pozwala na ograniczenie długości listy tabu.
+W przypadku przekroczenia tej długości, usuwany jest najstarszy element z listy(czyli element o indeksie 0, 
+ponieważ dodawanie następuje na koniec listy).
+
+
 
   
 

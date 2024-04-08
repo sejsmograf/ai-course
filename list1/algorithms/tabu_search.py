@@ -1,11 +1,11 @@
-from itertools import permutations
+from typing import Optional
 from .results import (
     SearchResult,
     TabuSearchResult,
     tabu_route_info_decorator,
 )
 from typing import Callable
-from process_data import Graph, Route, Stop
+from process_data import Graph, Stop
 from .astar import create_astar
 
 
@@ -48,6 +48,7 @@ def tabu_search(
     departure_min: int,
     search_function: Callable,
     max_iterations: int,
+    tabu_list_size: Optional[int] = None,
 ) -> TabuSearchResult:
     best_solution: TabuSearchResult = create_path_between_stops(
         graph, [start] + to_visit + [start], departure_min, search_function
@@ -76,6 +77,8 @@ def tabu_search(
 
         current_solution = best_neighbor_solution
         tabu_list.append(best_neighbor_solution)
+        if tabu_list_size and len(tabu_list) > tabu_list_size:
+            tabu_list.pop(0)
 
         if best_neighbor_solution.total_cost < best_solution.total_cost:
             best_solution = best_neighbor_solution
