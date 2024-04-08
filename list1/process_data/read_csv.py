@@ -1,4 +1,5 @@
 from csv import DictReader
+import logging
 from pathlib import Path
 from .serialize import deserialize, serialize
 
@@ -10,15 +11,20 @@ SERIALIZED_CSV_PATH: Path = PARENT_DIR_PATH / "data/serialized_connection_graph.
 
 
 def read_csv_to_dict(path: Path) -> list[dict[str, str]]:
-    with open(path) as file:
-        reader: DictReader = DictReader(file)
+    try:
+        with open(path) as file:
+            reader: DictReader = DictReader(file)
 
-        data: list[dict[str, str]] = []
+            data: list[dict[str, str]] = []
 
-        for row in reader:
-            data.append(row)
+            for row in reader:
+                data.append(row)
 
-        return data
+            return data
+    except FileNotFoundError as e:
+        logging.error(e)
+        logging.error(f"Create ./data/connection_graph.csv file, or pass data path")
+        exit(1)
 
 
 def get_data(
